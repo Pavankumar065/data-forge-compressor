@@ -18,9 +18,9 @@ const DownloadButton = ({ isEnabled, fileName, mode, onDownload }: DownloadButto
 
   const getFileName = () => {
     if (mode === 'compress') {
-      return fileName + '.compressed';
+      return fileName;
     }
-    return fileName.replace('.compressed', '') || fileName;
+    return fileName;
   };
 
   if (!isEnabled) {
