@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import Home from "./pages/Home";
 import Compressor from "./pages/Compressor";
+import WhiteboardHome from "./pages/WhiteboardHome";
+import Whiteboard from "./pages/Whiteboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,8 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
             <Route path="/compressor" element={<Compressor darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
+            <Route path="/whiteboard" element={<WhiteboardHome darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
+            <Route path="/whiteboard/:roomId" element={<Whiteboard darkMode={darkMode} toggleDarkMode={toggleDarkMode} />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
