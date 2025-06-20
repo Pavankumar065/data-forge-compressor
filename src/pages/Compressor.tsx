@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { FileArchive, Play, Clock, BarChart3 } from 'lucide-react';
 import Navbar from '../components/Navbar';
@@ -19,12 +20,14 @@ const Compressor = ({ darkMode, toggleDarkMode }: CompressorProps) => {
   const [selectedMode, setSelectedMode] = useState<'compress' | 'decompress'>('compress');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isProcessed, setIsProcessed] = useState(false);
-  const [stats, setStats] = useState({
-    originalSize: 0,
-    compressedSize: 0,
-    compressionRatio: 0,
-    processingTime: 0
-  });
+  const [stats, setStats] = useState<{
+    originalSize: number;
+    compressedSize: number;
+    compressionRatio: number;
+    timeTaken: number;
+    algorithm: string;
+    mode: string;
+  } | null>(null);
   const [processedFileData, setProcessedFileData] = useState<{
     content: string | ArrayBuffer;
     name: string;
@@ -35,6 +38,7 @@ const Compressor = ({ darkMode, toggleDarkMode }: CompressorProps) => {
     setSelectedFile(file);
     setIsProcessed(false);
     setProcessedFileData(null);
+    setStats(null);
   };
 
   const handleAlgorithmChange = (algorithm: string) => {
@@ -91,11 +95,14 @@ const Compressor = ({ darkMode, toggleDarkMode }: CompressorProps) => {
         type: selectedFile.type
       });
 
+      // Update stats with correct structure
       setStats({
         originalSize: selectedFile.size,
         compressedSize: processedSize,
-        compressionRatio: selectedFile.size / processedSize,
-        processingTime: processingTime
+        compressionRatio: ((selectedFile.size - processedSize) / selectedFile.size) * 100,
+        timeTaken: processingTime,
+        algorithm: selectedAlgorithm,
+        mode: selectedMode
       });
 
       setIsProcessed(true);
@@ -235,18 +242,10 @@ const Compressor = ({ darkMode, toggleDarkMode }: CompressorProps) => {
           )}
 
           {/* Compression Stats */}
-          {isProcessed && (
-            <div className="mb-8">
-              <CompressionStats
-                originalSize={stats.originalSize}
-                compressedSize={stats.compressedSize}
-                compressionRatio={stats.compressionRatio}
-                processingTime={stats.processingTime}
-                algorithm={selectedAlgorithm}
-                mode={selectedMode}
-              />
-            </div>
-          )}
+          <CompressionStats
+            stats={stats}
+            isLoading={isProcessing}
+          />
 
           {/* Download Button */}
           {isProcessed && processedFileData && (
@@ -285,6 +284,33 @@ const Compressor = ({ darkMode, toggleDarkMode }: CompressorProps) => {
       <Footer />
     </div>
   );
+};
+
+const readFileContent = (file: File): Promise<string | ArrayBuffer> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      resolve(e.target?.result || '');
+    };
+    
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'));
+    };
+
+    // For text files, read as text to preserve content exactly
+    if (file.type.startsWith('text/') || 
+        file.name.endsWith('.txt') || 
+        file.name.endsWith('.json') || 
+        file.name.endsWith('.csv') || 
+        file.name.endsWith('.html') || 
+        file.name.endsWith('.xml')) {
+      reader.readAsText(file);
+    } else {
+      // For binary files, read as array buffer
+      reader.readAsArrayBuffer(file);
+    }
+  });
 };
 
 export default Compressor;
