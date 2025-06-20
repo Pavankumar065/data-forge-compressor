@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Canvas as FabricCanvas, Circle, Rect, Path } from 'fabric';
@@ -51,9 +52,11 @@ const Whiteboard = ({ darkMode, toggleDarkMode }: { darkMode: boolean; toggleDar
         backgroundColor: '#ffffff',
       });
 
-      // Initialize the freeDrawingBrush properly
-      canvas.freeDrawingBrush.color = activeColor;
-      canvas.freeDrawingBrush.width = brushSize;
+      // Initialize the freeDrawingBrush properly - check if it exists first
+      if (canvas.freeDrawingBrush) {
+        canvas.freeDrawingBrush.color = activeColor;
+        canvas.freeDrawingBrush.width = brushSize;
+      }
       
       setFabricCanvas(canvas);
 
@@ -143,6 +146,7 @@ const Whiteboard = ({ darkMode, toggleDarkMode }: { darkMode: boolean; toggleDar
 
     fabricCanvas.isDrawingMode = activeTool === 'pen';
     
+    // Check if freeDrawingBrush exists before setting properties
     if (activeTool === 'pen' && fabricCanvas.freeDrawingBrush) {
       fabricCanvas.freeDrawingBrush.color = activeColor;
       fabricCanvas.freeDrawingBrush.width = brushSize;
