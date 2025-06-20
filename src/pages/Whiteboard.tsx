@@ -220,8 +220,11 @@ const Whiteboard = ({ darkMode, toggleDarkMode }: { darkMode: boolean; toggleDar
     if (!fabricCanvas) return;
 
     if (format === 'png' || format === 'jpg') {
+      // Convert 'jpg' to 'jpeg' for Fabric.js compatibility
+      const fabricFormat = format === 'jpg' ? 'jpeg' : format;
+      
       const dataURL = fabricCanvas.toDataURL({
-        format: format,
+        format: fabricFormat,
         quality: 1,
         multiplier: 2
       });
